@@ -47,16 +47,17 @@ contract MUSD is
 
     constructor(
         address _blast,
-        address _usdb
+        address _usdb,
+        address _burnMonoFeeTo
     ) ERC20("Monoswap USD", "MUSD") ERC20Permit("Monoswap USD") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(PAUSER_ROLE, msg.sender);
+        burnMonoFeeTo = _burnMonoFeeTo;
 
         blast = IBlast(_blast);
         usdb = IERC20Rebasing(_usdb);
         usdb.configure(YieldMode.AUTOMATIC);
 
-        blast.configureAutomaticYield();
         blast.configureClaimableGas();
         blast.configureGovernor(msg.sender);
     }
