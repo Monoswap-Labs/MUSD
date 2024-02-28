@@ -27,9 +27,8 @@ contract MUSD is
     IBlast public blast;
     IMono public mono;
     IMonoswapRouter public monoswapRouter;
-    uint256 public protocolFee = 30; // 0.3%
+    uint256 public treasureFee = 30; // 0.3%
     uint256 public burnMonoFee = 20; // 0.2%
-    address public protocolFeeTo;
     address public burnMonoFeeTo;
     address[] public path;
 
@@ -55,11 +54,11 @@ contract MUSD is
 
         blast = IBlast(_blast);
         usdb = IERC20Rebasing(_usdb);
+        usdb.configure(YieldMode.AUTOMATIC);
 
         blast.configureAutomaticYield();
         blast.configureClaimableGas();
         blast.configureGovernor(msg.sender);
-        usdb.configure(YieldMode.AUTOMATIC);
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {
@@ -90,12 +89,11 @@ contract MUSD is
         if (usdbReserve != 0) {
             amountUSDB = (amount * usdbReserve) / musdReserve;
         }
-        uint256 protocolFeeAmount = (amountUSDB * protocolFee) /
+        uint256 treasureFeeAmount = (amountUSDB * treasureFee) /
             PERCENT_DENOMINATOR;
-        usdb.transfer(protocolFeeTo, protocolFeeAmount);
         uint256 burnMonoFeeAmount = (amountUSDB * burnMonoFee) /
             PERCENT_DENOMINATOR;
-        amountUSDB = amountUSDB - protocolFeeAmount - burnMonoFeeAmount;
+        amountUSDB = amountUSDB - treasureFeeAmount - burnMonoFeeAmount;
         if (address(monoswapRouter) != address(0)) {
             _swap(burnMonoFeeAmount);
             mono.burn(mono.balanceOf(address(this)));
@@ -109,12 +107,9 @@ contract MUSD is
     }
 
     function setFeeTo(
-        address _protocolFeeTo,
         address _burnMonoFeeTo
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(_protocolFeeTo != address(0), "MUSD: INVALID_PROTOCOL_FEE_TO");
         require(_burnMonoFeeTo != address(0), "MUSD: INVALID_BURN_MONO_FEE_TO");
-        protocolFeeTo = _protocolFeeTo;
         burnMonoFeeTo = _burnMonoFeeTo;
     }
 
@@ -172,16 +167,16 @@ contract MUSD is
     }
 
     function setWithdrawFee(
-        uint256 _protocolFee,
+        uint256 _treasureFee,
         uint256 _burnMonoFee
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(
-            _protocolFee + _burnMonoFee < PERCENT_DENOMINATOR &&
-                _protocolFee > 0 &&
+            _treasureFee + _burnMonoFee < PERCENT_DENOMINATOR &&
+                _treasureFee > 0 &&
                 _burnMonoFee > 0,
             "MUSD: INVALID_WITHDRAW_FEE"
         );
-        protocolFee = _protocolFee;
+        treasureFee = _treasureFee;
         burnMonoFee = _burnMonoFee;
     }
 
