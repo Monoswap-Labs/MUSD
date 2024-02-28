@@ -5,17 +5,17 @@ import { MUSD } from '../typechain-types';
 async function main() {
   const [deployer] = await ethers.getSigners();
   console.log('Deploying contracts with the account:', deployer.address);
-  const mono = await ethers.getContractAt(
-    'IERC20',
-    '0xa07aC8cDe2a98B189477b8e41F0c2Ea6CdDbC055'
+  const blast = '0x4300000000000000000000000000000000000002';
+  const usdb = '0x4300000000000000000000000000000000000003';
+  const blastPoints = '0x2536FE9ab3F511540F2f9e2eC2A805005C3Dd800';
+  const burnFeeTo = '0xD20687d1c79DaE7B3A5b22B43fe15f360ceA0fAF';
+  const musd = await deployContract(
+    'MUSD',
+    [blast, blastPoints, usdb, burnFeeTo],
+    'MUSD',
+    null
   );
-  const musd = await deployContract('MUSD', [], 'MUSD', null);
 
-  await sendTxn(musd.setMono(await mono.getAddress()), 'MUSD.setMono');
-  await sendTxn(
-    musd.setFeeTo(deployer.address, deployer.address),
-    'MUSD.setFeeTo'
-  );
   await sendTxn(musd.config(), 'MUSD.config');
 }
 

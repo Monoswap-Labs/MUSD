@@ -29,15 +29,10 @@ const config: HardhatUserConfig = {
       gasPrice: 5000000000,
       accounts: [process.env.BNB_TESTNET_PRIVATE_KEY || ''],
     },
-    sepolia: {
-      url: 'https://rpc.sepolia.org',
-      accounts: [process.env.SEPOLIA_PRIVATE_KEY || ''],
-    },
     // for mainnet
     blastMainnet: {
-      url: 'coming end of February',
+      url: `https://rpc.ankr.com/blast`,
       accounts: [process.env.BLAST_MAINNET_PRIVATE_KEY || ''],
-      gasPrice: 1000000000,
     },
     // for Sepolia testnet
     blastSepolia: {
