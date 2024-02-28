@@ -11,6 +11,7 @@ import "./interface/IMonoswapRouter.sol";
 import "./interface/IMono.sol";
 import "./interface/IBlast.sol";
 import "./interface/IERC20Rebasing.sol";
+import "./interface/IBlastPoints.sol";
 
 contract MUSD is
     ERC20,
@@ -47,6 +48,7 @@ contract MUSD is
 
     constructor(
         address _blast,
+        address _blastPoints,
         address _usdb,
         address _burnMonoFeeTo
     ) ERC20("Monoswap USD", "MUSD") ERC20Permit("Monoswap USD") {
@@ -57,6 +59,7 @@ contract MUSD is
         blast = IBlast(_blast);
         usdb = IERC20Rebasing(_usdb);
         usdb.configure(YieldMode.AUTOMATIC);
+        IBlastPoints(_blastPoints).configurePointsOperator(msg.sender);
 
         blast.configureClaimableGas();
         blast.configureGovernor(msg.sender);
